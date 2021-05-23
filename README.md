@@ -13,7 +13,9 @@
   - https://docs.google.com/document/d/1GFo3W6XxqhxDVVqxiSEtqkuVCX93Tdb3xzINRtTIx10/edit
 
 - 잘 작성된 REST API > https://docs.github.com/en/rest
-- HAL -> Hypertext Application Language
 
+- HAL -> Hypertext Application Language
 - Spring REST Docs
   - https://spring.io/projects/spring-restdocs
+- Spring HETEOAS
+  - https://spring.io/projects/spring-hateoas
