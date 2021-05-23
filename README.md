@@ -14,3 +14,6 @@
 
 - 잘 작성된 REST API > https://docs.github.com/en/rest
 - HAL -> Hypertext Application Language
+
+- Spring REST Docs
+  - https://spring.io/projects/spring-restdocs
