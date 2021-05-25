@@ -1,0 +1,71 @@
+package me.rest.restapiwithspringboot.events;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+/*
+* @WebMvcTest
+* MockMvc 빈을 자동 설정 해준다. 따라서 그냥 가져와서 쓰면 됨.
+* 웹 관련 빈만 등록해 준다. (슬라이스)
+* */
+@RunWith(SpringRunner.class)
+@WebMvcTest
+public class EventControllerTests {
+
+    /*
+    * MockMvc는 요청을만들고 응답을 검증할수있는 스프링MVC 테스트에 있어서 핵심적인 클래스 중 하나.
+    * 웹 서버를 띄우지 않고도 스프링 MVC (DispatcherServlet)가 요청을 처리하는 과정을 확인할 수 있기 때문에 컨트롤러 테스트용으로 자주 쓰임.
+    * 디스패처서블릿을 만들어야하기때문에 단위테스트보다는 느림.
+    * */
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Test
+    public void createEvent() throws Exception {
+
+        Event event = Event.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021,5,26,23,03))
+                .beginEventDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .endEventDateTime(LocalDateTime.of(2021,5,26,23,03))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+
+        /*
+        * perform 안에 post 요청을 줌
+        * */
+        mockMvc.perform(post("/api/events/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaTypes.HAL_JSON)
+                    .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print()) //  Location 헤더에 생성된 이벤트를 조회할 수 있는 URI 담겨 있는지 확인.
+                .andExpect(status().isCreated()) // 해당 요청의 응답으로 isCreated (201) 을 만족하는지 확인.
+                .andExpect(jsonPath("id").exists()) //  id는 DB에 들어갈 때 자동생성된 값으로 나오는지 확인
+                ;
+    }
+
+
+}
