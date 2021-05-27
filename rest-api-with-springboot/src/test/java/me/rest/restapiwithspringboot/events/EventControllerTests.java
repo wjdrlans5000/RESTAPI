@@ -3,9 +3,12 @@ package me.rest.restapiwithspringboot.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,13 +17,13 @@ import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /*
 * @WebMvcTest
 * MockMvc 빈을 자동 설정 해준다. 따라서 그냥 가져와서 쓰면 됨.
 * 웹 관련 빈만 등록해 준다. (슬라이스)
+* 리파지토리 빈으로 등록해주지 않음.
 * */
 @RunWith(SpringRunner.class)
 @WebMvcTest
@@ -37,6 +40,11 @@ public class EventControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    //리파지토리를 목킹
+    @MockBean
+    EventRepository eventRepository;
+
+
     @Test
     public void createEvent() throws Exception {
 
@@ -52,6 +60,9 @@ public class EventControllerTests {
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타텁 팩토리")
                 .build();
+        //eventRepository의 세이브가 호출이되면 이벤트를 리턴하라
+        event.setId(10);
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         /*
         * perform 안에 post 요청을 줌
@@ -64,7 +75,9 @@ public class EventControllerTests {
                 .andDo(print()) //  Location 헤더에 생성된 이벤트를 조회할 수 있는 URI 담겨 있는지 확인.
                 .andExpect(status().isCreated()) // 해당 요청의 응답으로 isCreated (201) 을 만족하는지 확인.
                 .andExpect(jsonPath("id").exists()) //  id는 DB에 들어갈 때 자동생성된 값으로 나오는지 확인
-                ;
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+        ;
     }
 
 

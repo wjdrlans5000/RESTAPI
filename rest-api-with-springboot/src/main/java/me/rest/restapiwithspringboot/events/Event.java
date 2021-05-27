@@ -2,6 +2,7 @@ package me.rest.restapiwithspringboot.events;
 
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /*
@@ -15,8 +16,10 @@ id의 값만가지고 이퀄스와 해쉬코드 값을 비교하도록 사용.
 */
 @Builder @AllArgsConstructor @NoArgsConstructor
 @Getter @Setter @EqualsAndHashCode(of = "id")
+@Entity
 public class Event {
 
+    @Id @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -38,6 +41,7 @@ public class Event {
     private int limitOfEnrollment;
     private boolean offline;
     private boolean free;
+    @Enumerated(EnumType.STRING) //기본값은 오디널인데 이는 이넘의 순서로 맵핑 즉, 추후 순서변경시 꼬일수있기에 STRING사용 권장.
     private EventStatus eventStatus;
 
 }
