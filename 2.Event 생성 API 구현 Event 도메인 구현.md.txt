@@ -1,0 +1,75 @@
+# Event 생성 API 구현: Event 도메인 구현
+- EqualsAndHashCode 를 사용하면 모든 필드를 기반으로 생성하기 때문에 id의 값만가지고 이퀄스와 해쉬코드 값을 비교하도록 of = "id" 를 명시하여 생성해주었다.
+  - JPA 연관관계 매핑시 무한루프가 발생할 가능성이 있음(스택오버플로우 발생).
+- builder를 사용하면 기본생성자가 생성되지않고 모든 파라미터를 가지고 있는 생성자가 생성되기 때문에 NoArgsConstructor, AllArgsConstructor 를 추가
+  - @AllArgsConstructor @NoArgsConstructor 기본생성자와 모든 아규먼트를 가진 생성자 둘다 만들기위해 사용
+- Lombok 애노테이션은 meta 애노테이션으로 동작하지 않음.
+
+```java
+/*
+빌더로 생성하면 기본 생성자가 생성되지 않고 모든 파라미터를 가지고 있는 생성자가 생성됨.
+public이 아닌 default로 생성됨(다른패카지에서 이 이벤트에 대한 객체를 만들기가 애매함
+*/
+@Builder @AllArgsConstructor @NoArgsConstructor
+@Getter @Setter @EqualsAndHashCode(of = "id")
+public class Event {
+
+    private Integer id;
+    private String name;
+    private String description;
+    private LocalDateTime beginEnrollmentDateTime;
+    private LocalDateTime closeEnrollmentDateTime;
+    private LocalDateTime beginEventDateTime;
+    private LocalDateTime endEventDateTime;
+    private String location; // (optional) 이게 없으면 온라인 모임
+    private int basePrice; // (optional)
+    private int maxPrice; // (optional)
+    private int limitOfEnrollment;
+    private boolean offline;
+    private boolean free;
+    private EventStatus eventStatus;
+
+}
+```
+
+```java
+public enum EventStatus {
+
+    DRAFT, PUBLISHED, BAEGAN_ENROLLMENT;
+
+}
+```
+
+```java
+public class EventTest {
+
+    @Test
+    public  void builder(){
+        Event event = Event.builder( )
+                .name("Spring REST API")
+                .description("REST API development with spring boot")
+                .build();
+
+        assertThat(event).isNotNull();
+    }
+
+    @Test
+    public void javaBean(){
+        //Given
+        Event event = new Event();
+        String name = "Event";
+        String description = "Spring";
+
+        //When
+        event.setName(name);
+        event.setDescription(description);
+
+        //Then
+        assertThat(event.getName()).isEqualTo(name);
+        assertThat(event.getDescription()).isEqualTo(description);
+    }
+
+} 
+```
+- lombok 사용시 @Data를 사용하면 편리하지만, @EqualsAndHashCode도 구현하기때문에 연관관계가 매핑되어있는 엔티티 클래스에서는 무한루프 (스택오버플로우) 가 발생한다.
+- 최소한 엔티티 클래스에서는 사용하지 말것을 권장한다.
