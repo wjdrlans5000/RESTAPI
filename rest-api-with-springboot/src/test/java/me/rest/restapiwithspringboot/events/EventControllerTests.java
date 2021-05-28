@@ -53,6 +53,42 @@ public class EventControllerTests {
     @Test
     public void createEvent() throws Exception {
 
+        EventDto event = EventDto.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021,5,26,23,03))
+                .beginEventDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .endEventDateTime(LocalDateTime.of(2021,5,26,23,03))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+
+        /*
+         * perform 안에 post 요청을 줌
+         * */
+        mockMvc.perform(post("/api/events/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(event))
+        )
+                .andDo(print()) //  Location 헤더에 생성된 이벤트를 조회할 수 있는 URI 담겨 있는지 확인.
+                .andExpect(status().isCreated()) // 해당 요청의 응답으로 isCreated (201) 을 만족하는지 확인.
+                .andExpect(jsonPath("id").exists()) //  id는 DB에 들어갈 때 자동생성된 값으로 나오는지 확인
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
+                //입력값 제한하기
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT)))
+        ;
+    }
+
+    @Test
+    public void createEvent_Bad_Request() throws Exception {
+
         Event event = Event.builder()
                 .id(100) //db들어갈때 자동생성되야함
                 .name("Spring")
@@ -74,24 +110,15 @@ public class EventControllerTests {
 //        Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         /*
-        * perform 안에 post 요청을 줌
-        * */
+         * perform 안에 post 요청을 줌
+         * */
         mockMvc.perform(post("/api/events/")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event))
-                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(event)))
                 .andDo(print()) //  Location 헤더에 생성된 이벤트를 조회할 수 있는 URI 담겨 있는지 확인.
-                .andExpect(status().isCreated()) // 해당 요청의 응답으로 isCreated (201) 을 만족하는지 확인.
-                .andExpect(jsonPath("id").exists()) //  id는 DB에 들어갈 때 자동생성된 값으로 나오는지 확인
-                .andExpect(header().exists("Location"))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
-                //입력값 제한하기
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not(true)))
-                .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT)))
+                .andExpect(status().isBadRequest()) //unknown 프로퍼티들(EventDTO가 아닌 프로퍼티들)을 넘기고 있으면 400 bad request가 떨어짐
         ;
     }
-
 
 }
