@@ -121,4 +121,17 @@ public class EventControllerTests {
         ;
     }
 
+//    아무런 입력값도 받지 않을경우 BAD_REQUEST를 받는 테스트코드
+    @Test
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        //입력값이 없기때문에 베드리퀘스트가 나와야함 (201이나오면 안됨.)
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+
 }

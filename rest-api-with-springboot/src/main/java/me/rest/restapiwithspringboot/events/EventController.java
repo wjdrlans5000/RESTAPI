@@ -4,10 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -28,7 +30,14 @@ public class EventController {
 
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody EventDto eventDto){
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
+        //@Valid를 사용하면 Handler Method에서 데이터를 바인딩시 검증을 진행한다.
+        //이때 애노테이션들의 정보를 참고해서 검증을 수행한다.
+        //eventDto 바인딩시 에러발생할경우 Errors객체로 바인딩
+        if(errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
         //모델매퍼로 이벤트DTO에 있 는것을 EVENT 클래스의 인스턴스로 변환
         Event event = modelMapper.map(eventDto, Event.class);
         //save에 전달한 객체는 새로 만들어진 객체
