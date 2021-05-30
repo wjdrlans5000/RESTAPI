@@ -1,6 +1,7 @@
 package me.rest.restapiwithspringboot.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.rest.restapiwithspringboot.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,7 @@ public class EventControllerTests {
 
 
     @Test
+    @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {
 
         EventDto event = EventDto.builder()
@@ -87,6 +89,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("입력값이 받을수 없는  값을 사용한 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request() throws Exception {
 
         Event event = Event.builder()
@@ -123,6 +126,7 @@ public class EventControllerTests {
 
 //    아무런 입력값도 받지 않을경우 BAD_REQUEST를 받는 테스트코드
     @Test
+    @TestDescription("입력값이 비어있는 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
         //입력값이 없기때문에 베드리퀘스트가 나와야함 (201이나오면 안됨.)
         EventDto eventDto = EventDto.builder().build();
@@ -135,6 +139,7 @@ public class EventControllerTests {
 
     //입력값이 들어오지만  이상한경우 테스트코드
     @Test
+    @TestDescription("입력값이 잘못된 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
         //입력값이 없기때문에 베드리퀘스트가 나와야함 (201이나오면 안됨.)
         EventDto eventDto = EventDto.builder()
