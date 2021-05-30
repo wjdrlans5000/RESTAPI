@@ -23,9 +23,12 @@ public class EventController {
 
     private final ModelMapper modelMapper;
 
-    public EventController(EventRepository eventRepository, ModelMapper modelMapper){
+    private final EventVaildator eventVaildator;
+
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventVaildator eventVaildator){
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
+        this.eventVaildator = eventVaildator;
     }
 
 
@@ -37,6 +40,12 @@ public class EventController {
         if(errors.hasErrors()){
             return ResponseEntity.badRequest().build();
         }
+
+        eventVaildator.validate(eventDto, errors);
+        if(errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
 
         //모델매퍼로 이벤트DTO에 있 는것을 EVENT 클래스의 인스턴스로 변환
         Event event = modelMapper.map(eventDto, Event.class);

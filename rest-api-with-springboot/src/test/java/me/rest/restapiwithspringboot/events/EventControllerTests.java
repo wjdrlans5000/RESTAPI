@@ -133,5 +133,30 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    //입력값이 들어오지만  이상한경우 테스트코드
+    @Test
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        //입력값이 없기때문에 베드리퀘스트가 나와야함 (201이나오면 안됨.)
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                //이벤트 끝나는 날짜가 시작날짜보다 빠름 -> 즉 값이 잘못됨.
+                .beginEnrollmentDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .closeEnrollmentDateTime(LocalDateTime.of(2021,5,26,23,03))
+                .beginEventDateTime(LocalDateTime.of(2021,5,25,23,03))
+                .endEventDateTime(LocalDateTime.of(2021,5,26,23,03))
+                //베이스가 10000인데 맥스가 200??? -> 값이 잘못됨.
+                //애노테이션으로 검증하기가 어려움.
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
 
 }
