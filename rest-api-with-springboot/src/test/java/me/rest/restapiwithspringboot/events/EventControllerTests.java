@@ -161,7 +161,16 @@ public class EventControllerTests {
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
-                .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+        // 시리얼라이저에서 필드에러를 먼저 만들었기떄문에 필드에러가 없는경우에 깨짐
+        // 원래는 더 꼼꼼히 테스트 작성해야함.
+//                .andExpect(jsonPath("$[0].field").exists())
+//                .andExpect(jsonPath("$[0].rejectedValue").exists())
+        ;
     }
 
 }

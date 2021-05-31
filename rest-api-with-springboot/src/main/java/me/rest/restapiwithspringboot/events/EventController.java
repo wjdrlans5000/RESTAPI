@@ -38,12 +38,12 @@ public class EventController {
         //이때 애노테이션들의 정보를 참고해서 검증을 수행한다.
         //eventDto 바인딩시 에러발생할경우 Errors객체로 바인딩
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         eventVaildator.validate(eventDto, errors);
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
 
