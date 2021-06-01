@@ -49,6 +49,7 @@ public class EventController {
 
         //모델매퍼로 이벤트DTO에 있 는것을 EVENT 클래스의 인스턴스로 변환
         Event event = modelMapper.map(eventDto, Event.class);
+        event.update();
         //save에 전달한 객체는 새로 만들어진 객체
         Event newEvent =  this.eventRepository.save(event);
         /*

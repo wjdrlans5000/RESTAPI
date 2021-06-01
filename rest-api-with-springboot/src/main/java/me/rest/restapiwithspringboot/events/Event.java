@@ -44,4 +44,18 @@ public class Event {
     @Enumerated(EnumType.STRING) //기본값은 오디널인데 이는 이넘의 순서로 맵핑 즉, 추후 순서변경시 꼬일수있기에 STRING사용 권장.
     private EventStatus eventStatus;
 
+    public void update() {
+        //Update Free
+        if(this.basePrice == 0 && this.maxPrice ==0){
+            this.free =  true;
+        }else{
+            this.free = false;
+        }
+        //Update offline
+        if(this.location == null || this.location.isBlank()){
+            this.offline = false;
+        }else{
+            this.offline = true;
+        }
+    }
 }
