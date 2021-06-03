@@ -2,6 +2,7 @@ package me.rest.restapiwithspringboot.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -56,8 +57,18 @@ public class EventController {
         * Location URI 만들기
         * HATEOS가 제공하는 linkTo(), methodOn() 등 사용하여 uri 생성
         * */
-        URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        return ResponseEntity.created(createUri).body(event);
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createUri = selfLinkBuilder.toUri();
+        EventResource eventResource = new EventResource(event);
+//        RepresentationModel를  상속받으면 add Method를 통해 링크정보를 추가할 수 있다.
+//        withRel(): 이 링크가 리소스와 어떤 관계에 있는지 관계를 정의할 수 있다.
+//        withSelfRel(): 리소스에 대한 링크를 type-safe 한 method로 제공한다.
+//        Relation과 HREF 만 제공.
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        //self 추가 -> EventResource에서 추가시킴
+//        eventResource.add(selfLinkBuilder.withSelfRel());
+        eventResource.add(selfLinkBuilder.withRel("update-event"));
+        return ResponseEntity.created(createUri).body(eventResource);
     }
 
 }
