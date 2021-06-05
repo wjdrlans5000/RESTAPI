@@ -1,6 +1,7 @@
 package me.rest.restapiwithspringboot.events;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +69,8 @@ public class EventController {
         //self 추가 -> EventResource에서 추가시킴
 //        eventResource.add(selfLinkBuilder.withSelfRel());
         eventResource.add(selfLinkBuilder.withRel("update-event"));
+        //profile Link 추가
+        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
         return ResponseEntity.created(createUri).body(eventResource);
     }
 
