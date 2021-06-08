@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc // 모킹을 사용하지않고 실제 리파지토리를 사용하여 테스트 동작
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration.class) //다른 스프링 bean 설정파일을 읽어와서 사용하는 방법 중 하나
+@ActiveProfiles("test")
 public class EventControllerTests {
 
     /*
