@@ -1,5 +1,6 @@
 package me.rest.restapiwithspringboot.events;
 
+import me.rest.restapiwithspringboot.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
@@ -40,13 +41,13 @@ public class EventController {
         //이때 애노테이션들의 정보를 참고해서 검증을 수행한다.
         //eventDto 바인딩시 에러발생할경우 Errors객체로 바인딩
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         eventVaildator.validate(eventDto, errors);
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
-        }
+        return badRequest(errors);
+    }
 
 
         //모델매퍼로 이벤트DTO에 있 는것을 EVENT 클래스의 인스턴스로 변환
@@ -74,4 +75,7 @@ public class EventController {
         return ResponseEntity.created(createUri).body(eventResource);
     }
 
+    private ResponseEntity badRequest(Errors errors){
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
+    }
 }

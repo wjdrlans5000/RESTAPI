@@ -236,13 +236,18 @@ public class EventControllerTests {
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
+//                .andExpect(jsonPath("$[0].objectName").exists())
+//                .andExpect(jsonPath("$[0].defaultMessage").exists())
+//                .andExpect(jsonPath("$[0].code").exists())
         // 시리얼라이저에서 필드에러를 먼저 만들었기떄문에 필드에러가 없는경우에 깨짐
         // 원래는 더 꼼꼼히 테스트 작성해야함.
 //                .andExpect(jsonPath("$[0].field").exists())
 //                .andExpect(jsonPath("$[0].rejectedValue").exists())
+                // 에러발생시 index로 가는 링크가 존재하는지 테스트
+                .andExpect(jsonPath("errors[0].objectName").exists())
+                .andExpect(jsonPath("errors[0].defaultMessage").exists())
+                .andExpect(jsonPath("errors[0].code").exists())
+                .andExpect(jsonPath("_links.index").exists())
         ;
     }
 
