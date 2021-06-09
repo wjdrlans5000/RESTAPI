@@ -2,12 +2,17 @@ package me.rest.restapiwithspringboot.events;
 
 import me.rest.restapiwithspringboot.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +78,18 @@ public class EventController {
         //profile Link 추가
         eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
         return ResponseEntity.created(createUri).body(eventResource);
+    }
+
+    //Pageable > paging 과 관련된 정보들을 받아올 수 있음.
+    @GetMapping
+    public  ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler){
+        Page<Event> page = this.eventRepository.findAll(pageable);
+        //Page 를 페이징처리가 된 Model 목록으로 변환해준다.
+        //e-> new EventResource(e) > 각 Event를 EventResource 로 변환 작업
+        PagedModel pagedResources =   assembler.toModel(page, e-> new EventResource(e));
+        //Profile 에 대한 링크 정보만 추가
+        pagedResources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        return ResponseEntity.ok(pagedResources);
     }
 
     private ResponseEntity badRequest(Errors errors){
