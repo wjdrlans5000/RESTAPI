@@ -10,13 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 
 @RunWith(SpringRunner.class)
@@ -30,8 +30,11 @@ public class AccountServiceTest {
     @Autowired
     AccountService accountService;
 
+//    @Autowired
+//    AccountRepository accountRepository;
+
     @Autowired
-    AccountRepository accountRepository;
+    PasswordEncoder passwordEncoder;
 
     @Test
     public void findByUsername(){
@@ -44,7 +47,11 @@ public class AccountServiceTest {
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build()
                 ;
-        this.accountRepository.save(account);
+
+        //accountRepository의 save를 직접사용하지않고 accountService에 정의해둔 패스워드 인코더를 사용한 메서드 사용
+        this.accountService.saveAccount(account);
+
+//        this.accountRepository.save(account);
 
         //When
         UserDetailsService userDetailsService = (UserDetailsService) accountService;
@@ -54,7 +61,12 @@ public class AccountServiceTest {
         UserDetails userDetails =  userDetailsService.loadUserByUsername(userName);
 
         //Then
-        assertThat(userDetails.getPassword()).isEqualTo(password)
+        //입력한 패스워드와 인코딩되어 save된 패스워드가 일치하는지 확인
+        assertThat(this.passwordEncoder.matches(
+                password,
+                userDetails.getPassword()
+        )).isTrue();
+//        assertThat(userDetails.getPassword()).isEqualTo(password)
 
         ;
     }
