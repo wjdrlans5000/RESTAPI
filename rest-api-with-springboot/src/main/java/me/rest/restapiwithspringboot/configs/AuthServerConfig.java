@@ -2,6 +2,7 @@ package me.rest.restapiwithspringboot.configs;
 
 
 import me.rest.restapiwithspringboot.accounts.AccountService;
+import me.rest.restapiwithspringboot.common.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     TokenStore tokenStore;
 
+    @Autowired
+    AppProperties appProperties;
+
     //security 관련 설정
     //clientSecret을 사용할때 passwordEncoder를 사용하기때문에 bean으로 주입받아 사용한다.
     @Override
@@ -43,12 +47,12 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         //inMemory로 관리한다.
         clients.inMemory()
                 //client-id: myApp
-                .withClient("myApp")
+                .withClient(appProperties.getClientId())
                 .authorizedGrantTypes("password","refresh_token")
                 .scopes("read", "write")
                 //client-secret: pass
                 //passwordEncoder를 사용하여 확인하기 때문에 encoding을 해주어야 한다.
-                .secret(this.passwordEncoder.encode("pass"))
+                .secret(this.passwordEncoder.encode(appProperties.getClientSecret()))
                 //access-token 유효시간을 10분으로 설정한다.
                 .accessTokenValiditySeconds(10 * 60)
                 //refresh-token 유효시간을 1시간으로 설정한다.
